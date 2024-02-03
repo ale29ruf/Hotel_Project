@@ -1,4 +1,4 @@
-import org.apache.spark.sql.{SparkSession}
+import org.apache.spark.sql.SparkSession
 
 class Start {
 }
@@ -11,7 +11,7 @@ object Start {
       .getOrCreate()
     val dataset = spark.read
       .option("header", "true")
-      .csv("src/dataset/Hotel_Reviews.csv")
+      .csv("database/Hotel_Reviews.csv")
 
 
     // Seleziona la colonna di testo di interesse
