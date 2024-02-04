@@ -17,12 +17,13 @@ object Function1 {
       .mapValues(value => {
         value.split("\\s+")
         .foldLeft(Set.empty[String])((set, word) => set + word)
-        .intersect(importantWords).mkString(" ")
-      })
+        .intersect(importantWords).mkString(" ")})
+      //.map(kv => kv._1 + "\t" + kv._2)
+      //.saveAsTextFile("output")
 
     println("--------------OUTPUT--------------")
     // Visualizzazione delle prime 5 coppie
-    rdd_coppie_chiave_valore.take(2).foreach(println)
+    //rdd_coppie_chiave_valore.take(10).foreach(println)
     println("--------------END-OUTPUT--------------")
   }
 
