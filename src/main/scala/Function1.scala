@@ -14,11 +14,16 @@ object Function1 {
     val colsOfInterest = dataFrame.select("Reviewer_Nationality", "Negative_Review")
     val rdd_coppie_chiave_valore = colsOfInterest.rdd
       .map(row => ( row.getString(0), row.getString(1) ))
-      .groupByKey()
-      .map { case (key, phrase) => (key, phrase.filter(parola => importantWords.contains(parola.toLowerCase()))) }
+      .mapValues(value => {
+        value.split("\\s+")
+        .foldLeft(Set.empty[String])((set, word) => set + word)
+        .intersect(importantWords).mkString(" ")
+      })
 
+    println("--------------OUTPUT--------------")
     // Visualizzazione delle prime 5 coppie
-    rdd_coppie_chiave_valore.take(1).foreach(println)
+    rdd_coppie_chiave_valore.take(2).foreach(println)
+    println("--------------END-OUTPUT--------------")
   }
 
 }
