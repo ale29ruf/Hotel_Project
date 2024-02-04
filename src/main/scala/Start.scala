@@ -4,11 +4,13 @@ class Start {
 }
 
 object Start {
+
+  // Inizializzazione di SparkSession
+  val spark: SparkSession = SparkSession.builder().appName("HotelApp")
+    .config("spark.master", "local") // Esempio: esegui in modalità locale
+    .getOrCreate()
+
   def main(args: Array[String]): Unit = {
-    // Inizializzazione di SparkSession
-    val spark = SparkSession.builder().appName("HotelApp")
-      .config("spark.master", "local") // Esempio: esegui in modalità locale
-      .getOrCreate()
 
     val dataset = spark.read
       .option("header", "true")

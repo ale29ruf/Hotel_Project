@@ -1,3 +1,5 @@
+import org.apache.spark.SparkContext
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 // 1) Analizzare i commenti negativi in base alla nazionalità. Dunque capire le preferenze e i confort richiesti per una data nazione.
 
@@ -14,16 +16,22 @@ object Function1 {
     val colsOfInterest = dataFrame.select("Reviewer_Nationality", "Negative_Review")
     val rdd_coppie_chiave_valore = colsOfInterest.rdd
       .map(row => ( row.getString(0), row.getString(1) ))
-      .mapValues(value => {
-        value.split("\\s+")
-        .foldLeft(Set.empty[String])((set, word) => set + word)
-        .intersect(importantWords).mkString(" ")})
-      //.map(kv => kv._1 + "\t" + kv._2)
-      //.saveAsTextFile("output")
+      .mapValues(value =>
+        value
+          .split("\\s+")
+          .filter(word => importantWords.contains(word)).mkString(" "))
+
+    // Ottenere un array di RDD[String] con il parsing dei valori delle chiavi
+    val arrayRDD: Array[RDD[String]] = rdd_coppie_chiave_valore.map { case (chiave, valore) =>
+      // Esegui il parsing dei valori delle chiavi
+      Start.spark.sparkContext.parallelize(valore.split("\\s+")) }.collect()
+    // arrayRDD contiene un array di RDD[String], ciascuno contenente il parsing dei valori delle chiavi
+
+
 
     println("--------------OUTPUT--------------")
     // Visualizzazione delle prime 5 coppie
-    //rdd_coppie_chiave_valore.take(10).foreach(println)
+    //rdd_coppie_chiave_valore.take(1).foreach(println)
     println("--------------END-OUTPUT--------------")
   }
 
