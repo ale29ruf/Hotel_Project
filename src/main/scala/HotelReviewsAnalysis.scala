@@ -24,10 +24,10 @@ object HotelReviewAnalysis {
       .option("inferSchema", "true") // Inferisci automaticamente il tipo di dati delle colonne
       .csv(inputFile)
 
+
     val RDDReviews: RDD[String] = dati.select("Positive_Review").rdd.map(r => r.getString(0))
     val wordCount= RDDReviews.flatMap(s => s.split (" ")).map(s => (s, 1)).reduceByKey((a, b)=> a+b).
       sortBy { case (_, valore) => valore }
-
     wordCount.saveAsTextFile("C:\\Users\\asus\\Desktop\\file.txt")
   }
 }
