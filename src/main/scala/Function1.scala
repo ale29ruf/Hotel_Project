@@ -24,6 +24,7 @@ object Function1 {
       // Eseguo word count sul singolo array
       val wordCount = array
         .flatMap(_.split("\\s+")) // Split delle stringhe in singole parole
+        .filter(world => world.trim.nonEmpty)
         .groupBy(identity) // Raggruppa le parole per valore
         .view.mapValues(_.length) // Calcola la dimensione di ciascun gruppo, ovvero il conteggio delle parole
       // Restituisci il risultato dell'operazione sull'array di stringhe
