@@ -56,9 +56,5 @@ object ClusteringHotelScore{
     //Mostra i centroidi dei cluster
     println("Cluster Centers: ")
     model.clusterCenters.foreach(println)
-
-
-
-
   }
 }
