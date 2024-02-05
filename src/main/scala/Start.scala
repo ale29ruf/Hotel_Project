@@ -17,6 +17,7 @@ object Start {
       .csv("database/Hotel_Reviews.csv")
 
     Function1.eseguiAnalisi(dataset)
+
     """
     // Seleziona la colonna di testo di interesse
     val textColumn = dataset.select("Negative_Review")
