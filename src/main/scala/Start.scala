@@ -25,7 +25,8 @@ object Start {
 
     // Esegui la tokenizzazione del testo e il conteggio delle parole
     val wordCounts = textColumn.rdd
-      .flatMap(_.toString.split("\\s+")) // Tokenizzazione del testo
+      .flatMap(_.toString.split("\\s+")) // "split" genera un array di stringhe, dunque se applicassimo solo la map
+      //avremmo un rdd di array di stringhe. Con la flatMap abbiamo invece un rdd di stringhe.
       .map(word => (word, 1)) // Assegna un conteggio iniziale di 1 a ciascuna parola
       // Converti il DataFrame in un RDD per utilizzare le funzioni di RDD
       .reduceByKey(_ + _) // Conteggio delle parole
