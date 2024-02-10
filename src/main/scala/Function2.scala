@@ -21,7 +21,14 @@ object Function2 {
         concatRev })
       .zip(dataFrame.select("Total_Number_of_Reviews").rdd.map(_.getInt(0)))
 
-
+    val revWithTotRev2 = dataFrame.select("Negative_Review", "Positive_Review").rdd
+      .map(row => {
+        val negRev = row.getString(0)
+        val posRev = row.getString(1)
+        val concatRev = s"$negRev $posRev"
+        concatRev
+      })
+      .zip(dataFrame.select("Total_Number_of_Reviews").rdd.map(_.getInt(0)))
 
     // Assembla le feature in un vettore
     val assembler = new VectorAssembler().setInputCols(Array("feature1", "feature2")).setOutputCol("features")
