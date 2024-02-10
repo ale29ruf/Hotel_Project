@@ -1,6 +1,6 @@
-import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.feature.VectorAssembler
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Row}
 
 // 4) Se il rewiever ha molti Total_Number_of_Reviews_Reviewer_Has_Given allora potrebbe essere uno che scrive
 // recensioni tanto per. Dunque la sua recensione potrebbe essere poco affidabile.
@@ -13,33 +13,32 @@ object Function2 {
   def eseguiAnalisi(dataFrame: DataFrame): Unit = {
 
     // Pre-processing dati
-    val revWithTotRev = dataFrame.select("Negative_Review", "Positive_Review").rdd
+    val lenRevWithTotRev = dataFrame.select("Review_Total_Negative_Word_Counts", "Review_Total_Positive_Word_Counts").rdd
       .map(row => {
-        val negRev = row.getString(0)
-        val posRev = row.getString(1)
-        val concatRev = s"$negRev $posRev"
-        concatRev })
-      .zip(dataFrame.select("Total_Number_of_Reviews").rdd.map(_.getInt(0)))
+        val negCnt = row.getString(0).toInt
+        val posCnt = row.getString(1).toInt
+        negCnt + posCnt })
+      .zip(dataFrame.select("Total_Number_of_Reviews_Reviewer_Has_Given").rdd.map(_.getString(0).toInt))
 
-    val revWithTotRev2 = dataFrame.select("Negative_Review", "Positive_Review").rdd
-      .map(row => {
-        val negRev = row.getString(0)
-        val posRev = row.getString(1)
-        val concatRev = s"$negRev $posRev"
-        concatRev
-      })
-      .zip(dataFrame.select("Total_Number_of_Reviews").rdd.map(_.getInt(0)))
+    // Occorre convertire revWithTotRev: RDD[(Int, Int)] in un dataFrame per poter usare l'algoritmo di k-means
+    // Definiamo prima lo schema che avrà il nuovo dataFrame
+    val schema = new StructType()
+      .add(StructField("ReviewLength", IntegerType, nullable = true))
+      .add(StructField("Total_Number_of_Reviews", IntegerType, nullable = true))
+
+    // Procediamo con la costruzione del nuovo dataFrame usando lo SparkSession.
+    // E' necessario prima creare un RDD[Row] a partire da revWithTotRev
+    val nuovoDataFrame :DataFrame = Start.spark
+      .createDataFrame(lenRevWithTotRev.map{ case (lenRev, totNumRev) => Row(lenRev, totNumRev) }, schema)
 
     // Assembla le feature in un vettore
-    val assembler = new VectorAssembler().setInputCols(Array("feature1", "feature2")).setOutputCol("features")
-    val dataset = assembler.transform(dataFrame)
+    val assembler = new VectorAssembler()
+      .setInputCols(Array("ReviewLength", "Total_Number_of_Reviews")) // specifica le colonne da combinare
+      .setOutputCol("features") // colonna risultante dei vettori
+    val dataset = assembler.transform(nuovoDataFrame)
+    // Questo nuovo DataFrame avrà una colonna aggiuntiva chiamata "features", che contiene i vettori combinati delle
+    // colonne "feature1" e "feature2". Seguono le prime 3 righe: [408,7,[408.0,7.0]], [105,7,[105.0,7.0]], [63,9,[63.0,9.0]]
 
-    // Crea il modello K-Means
-    val kmeans = new KMeans().setK(3).setSeed(1L)
-    val model = kmeans.fit(dataset)
-
-    // Esegui il clustering
-    val predictions = model.transform(dataset)
 
 
   }
