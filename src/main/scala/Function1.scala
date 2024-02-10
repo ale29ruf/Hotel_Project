@@ -30,7 +30,8 @@ object Function1 {
       // Qui puoi eseguire le operazioni desiderate sull'array di stringhe
       // Eseguo word count sul singolo array
       val wordCount = array
-        .flatMap(_.split("\\s+")) // Split delle stringhe in singole parole
+        .flatMap(_.split("\\s+")) // la flatMap consente di appiattire gli array di stringhe che genera "split"
+        // e di avere un RDD[String] piuttosto che un RDD[String[]]
         .filter(word => word.trim.nonEmpty)
         .groupBy(identity) // Raggruppa le parole per valore
         .view.mapValues(_.size) // Calcola la dimensione di ciascun gruppo, ovvero il conteggio delle parole
