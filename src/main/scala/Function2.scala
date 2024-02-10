@@ -1,3 +1,4 @@
+import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
@@ -38,6 +39,24 @@ object Function2 {
     val dataset = assembler.transform(nuovoDataFrame)
     // Questo nuovo DataFrame avrà una colonna aggiuntiva chiamata "features", che contiene i vettori combinati delle
     // colonne "feature1" e "feature2". Seguono le prime 3 righe: [408,7,[408.0,7.0]], [105,7,[105.0,7.0]], [63,9,[63.0,9.0]]
+
+    // Addestra il modello KMeans
+    val kmeans = new KMeans()
+      .setK(3)
+      .setSeed(1L)
+      .setMaxIter(30) // Imposta il numero massimo di iterazioni
+      .setTol(1e-4) // Imposta la soglia di convergenza
+    val model = kmeans.fit(dataset)
+
+    //Mostra i centroidi dei cluster
+    //println("Cluster Centers: ")
+    //model.clusterCenters.foreach(println)
+
+    // Ottieni i cluster per ciascun punto
+    val predictions = model.transform(dataset)
+    // Seguono le prime 3 righe: [408,7,[408.0,7.0],1], [105,7,[105.0,7.0],2], [63,9,[63.0,9.0],2]
+    // Lo schema del dataFrame predictions è il seguente:
+    // StructType(StructField(ReviewLength,IntegerType,true),StructField(Total_Number_of_Reviews,IntegerType,true),StructField(features,org.apache.spark.ml.linalg.VectorUDT@3bfc3ba7,true),StructField(prediction,IntegerType,false))
 
 
 
