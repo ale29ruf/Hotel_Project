@@ -16,4 +16,5 @@ ThisBuild / libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-core" % "2.20.0",
   "com.typesafe" % "config" % "1.4.2",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.0",
-  "com.sparkjava" % "spark-core" % "2.9.4")
+  "com.sparkjava" % "spark-core" % "2.9.4",
+  )
