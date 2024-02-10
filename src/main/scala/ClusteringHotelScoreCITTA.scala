@@ -3,15 +3,16 @@ import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SparkSession}
 
-class ClusteringHotelScore {
+class ClusteringHotelScoreCITTA {
 }
 
-object ClusteringHotelScore{
+object ClusteringHotelScoreCITTA{
 
-  private def nation(s: String) = {
+  private def citta(s: String) = {
     val list_splitted: Array[String] = s.split(" ")
-    if (list_splitted.nonEmpty)
-        list_splitted.last
+    val list_modified=list_splitted.diff(Array("United","Kingdom", "Netherlands", "Italy", "Spain", "Austria", "France"))
+    if (list_modified.nonEmpty)
+        list_modified.last
     else " "
   }
 
@@ -44,39 +45,42 @@ object ClusteringHotelScore{
     // Fornisci un implicit Encoder per il tuo tipo di dato
     implicit val encoder: Encoder[(String, Int)] = Encoders.product[(String, Int)]
 
-    val RDD_Nazione_LEVEL : RDD[(String, Int)]= dataFrameClassified.select("Hotel_Address", "prediction").
-      map(row => (nation(row.getAs[String]("Hotel_Address")), row.getAs[Int]("prediction")))(encoder).rdd
+    val RDD_Citta_LEVEL : RDD[(String, Int)]= dataFrameClassified.select("Hotel_Address", "prediction").
+      map(row => (citta(row.getAs[String]("Hotel_Address")), row.getAs[Int]("prediction")))(encoder).rdd
 
-    val RDD_Nazione_CountHotel: RDD[(String, Int)]= RDD_Nazione_LEVEL.map { case (chiave, _) => (chiave, 1)}.reduceByKey((a, b)=> a+b)
+    val RDD_Citta_CountHotel: RDD[(String, Int)]= RDD_Citta_LEVEL.map { case (chiave, _) => (chiave, 1)}.reduceByKey((a, b)=> a+b)
 
-    val RDD_Nazione_GOOD: RDD[(String, Int)]= RDD_Nazione_LEVEL
+    val RDD_Citta_GOOD: RDD[(String, Int)]= RDD_Citta_LEVEL
       .filter( coppia=> coppia._2==2)
       .map {case(chiave, _) =>(chiave, 1)}
       .reduceByKey(_+_)
 
-    val RDD_Nazione_INTERMEDIATE: RDD[(String, Int)] = RDD_Nazione_LEVEL
+    val RDD_Citta_INTERMEDIATE: RDD[(String, Int)] = RDD_Citta_LEVEL
       .filter(coppia => coppia._2 == 1)
       .map { case (chiave, _) => (chiave, 1) }
       .reduceByKey(_ + _)
 
-    val RDD_Nazione_BAD: RDD[(String, Int)] = RDD_Nazione_LEVEL
+    val RDD_Citta_BAD: RDD[(String, Int)] = RDD_Citta_LEVEL
       .filter(coppia => coppia._2 == 0)
       .map { case (chiave, _) => (chiave, 1) }
       .reduceByKey(_ + _)
 
-    val RDD_Nazione_Percent_GOOD = RDD_Nazione_GOOD.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
-    val RDD_Nazione_Percent_INTERMEDIATE = RDD_Nazione_INTERMEDIATE.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
-    val RDD_Nazione_Percent_BAD = RDD_Nazione_BAD.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
+    val RDD_Citta_Percent_GOOD = RDD_Citta_GOOD.join(RDD_Citta_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
+    val RDD_Citta_Percent_INTERMEDIATE = RDD_Citta_INTERMEDIATE.join(RDD_Citta_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
+    val RDD_Citta_Percent_BAD = RDD_Citta_BAD.join(RDD_Citta_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
 
 
-    println("---Percentuale hotel buoni per nazione---")
-    RDD_Nazione_Percent_GOOD.foreach(println)
 
-    println("---Percentuale hotel intermedi per nazione---")
-    RDD_Nazione_Percent_INTERMEDIATE.foreach(println)
+    RDD_Citta_Percent_GOOD.foreach(println)
+    println("---Percentuale hotel buoni per citta---")
 
-    println("---Percentuale hotel scarsi per nazione---")
-    RDD_Nazione_Percent_BAD.foreach(println)
+
+    RDD_Citta_Percent_INTERMEDIATE.foreach(println)
+    println("---Percentuale hotel intermedi per citta---")
+
+
+    RDD_Citta_Percent_BAD.foreach(println)
+    println("---Percentuale hotel scarsi per citta---")
 
     //Mostra i centroidi dei cluster
     println("Cluster Centers: ")
