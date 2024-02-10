@@ -2,24 +2,39 @@ import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SparkSession}
+import scala.io.Source
+
 
 class ClusteringHotelScoreCITTA {
 }
 
+/*
 object ClusteringHotelScoreCITTA{
 
-  private def citta(s: String) = {
-    val list_splitted: Array[String] = s.split(" ")
-    val list_modified=list_splitted.diff(Array("United","Kingdom", "Netherlands", "Italy", "Spain", "Austria", "France"))
-    if (list_modified.nonEmpty)
-        list_modified.last
-    else " "
+  def citta(latitude: Double, longitude: Double){
+    val apiKey =
+    val url = s"https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey"
+
+    // Esegui la richiesta HTTP e ottieni la risposta come stringa JSON
+    val jsonResponse = Source.fromURL(url).mkString
+
+    // Analizza la risposta JSON per ottenere le informazioni sulla città
+    val city = parseCityFromJson(jsonResponse)
+    city
   }
 
+  def parseCityFromJson(json: String): String = {
+    // Qui dovresti implementare la logica per analizzare il JSON e ottenere il nome della città
+    // Ad esempio, potresti usare una libreria JSON come circe per effettuare il parsing
+    // Ma per brevità, in questo esempio assumiamo che la città sia estratta direttamente dal JSON
+    "City Name" // Cambia questa linea con la logica di parsing reale
+  }
+}
 
   def main(args: Array[String]){
     val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
     val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
+
 
 
     val dati: DataFrame = spark.read
@@ -28,6 +43,12 @@ object ClusteringHotelScoreCITTA{
       .csv(inputFile)
 
     val dati_distinti_per_hotel: DataFrame= dati.dropDuplicates("Hotel_Address")
+    val coordinateEncoder: Encoder[Coordinate] = Encoders.product[Coordinate]
+
+
+
+
+
 
     val assembler = new VectorAssembler()
       .setInputCols(Array("Average_Score"))
@@ -87,3 +108,4 @@ object ClusteringHotelScoreCITTA{
     model.clusterCenters.foreach(println)
   }
 }
+*/
