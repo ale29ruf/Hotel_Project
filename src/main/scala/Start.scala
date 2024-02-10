@@ -16,7 +16,8 @@ object Start {
       .option("header", "true")
       .csv("database/Hotel_Reviews.csv")
 
-    Function1.eseguiAnalisi(dataset)
+    //Function1.eseguiAnalisi(dataset)
+    Function2.eseguiAnalisi(dataset)
 
     """
     // Seleziona la colonna di testo di interesse
