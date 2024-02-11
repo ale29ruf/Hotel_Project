@@ -17,7 +17,8 @@ object Start {
       .csv("database/Hotel_Reviews.csv")
 
     //Function1.eseguiAnalisi(dataset)
-    Function2.eseguiAnalisi(dataset)
+    //Function2.eseguiAnalisi(dataset)
+    Function3.eseguiAnalisi(dataset)
 
     """
     // Seleziona la colonna di testo di interesse
