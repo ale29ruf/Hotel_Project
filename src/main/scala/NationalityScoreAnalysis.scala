@@ -5,7 +5,7 @@ class NationalityScoreAnalysis {
 }
 
 object NationalityScoreAnalysis{
-  def main(args: Array[String]) {
+  def getNationalityScore(): collection.Map[String, Double] = {
     val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
     val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
 
@@ -21,12 +21,13 @@ object NationalityScoreAnalysis{
 
 
     val nationalityCount: RDD[(String, Int)] = coppieNationalityScore.map { case (chiave, _) => (chiave, 1) }.reduceByKey((a, b) => a + b)
-      .filter{ case (_, valore)=> valore>5000}
+      .filter { case (_, valore) => valore > 5000 }
     val nationalitySumScore: RDD[(String, Double)] = coppieNationalityScore.reduceByKey((a, b) => a + b)
 
     val nationalityMeanScore = nationalitySumScore.join(nationalityCount).map { case (chiave, (sum, count)) => (chiave, sum / count) }
       .sortBy(coppia => coppia._2, ascending = true)
 
     nationalityMeanScore.take(30).foreach(println)
+    nationalityMeanScore.collectAsMap()
   }
 }
