@@ -1,3 +1,7 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.scala.DefaultScalaModule;
+
+
 import static spark.Spark.*;
 
 public class WebService {
@@ -19,6 +23,12 @@ public class WebService {
             return "OK";
         });
 
+        // Creazione dell'ObjectMapper
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new DefaultScalaModule());
+
+
+
         // Abilita CORS per tutte le origini
         before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
@@ -36,7 +46,8 @@ public class WebService {
         });
 
         get("/nationalityScore", (request, response) -> {
-            return NationalityScoreAnalysis.getNationalityScore();
+            // Conversione della mappa in JSON
+            return mapper.writeValueAsString(NationalityScoreAnalysis.getNationalityScore());
         });
     }
 }
