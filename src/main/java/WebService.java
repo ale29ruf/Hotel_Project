@@ -15,6 +15,10 @@ public class WebService {
             String name = request.queryParams("name");
             return "Hello, " + name + "!";
         });
+
+        get("/nationalityScore", (request, response) -> {
+            return NationalityScoreAnalysis.getNationalityScore();
+        });
     }
 }
 
