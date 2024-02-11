@@ -1,5 +1,5 @@
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 class TagsAssociationAnalysis {
 }
 object TagsAssociationAnalysis{
@@ -16,7 +16,6 @@ object TagsAssociationAnalysis{
   def cleanStringa(stringa: String): String=
   { // Definisci l'espressione regolare per identificare parentesi quadre, virgole
       val regex = "[^a-zA-Z0-9]"
-
       val cleanedStringa = stringa.replaceAll(regex, " ")
       cleanedStringa
   }
