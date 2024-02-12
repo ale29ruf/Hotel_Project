@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.scala.DefaultScalaModule;
+import scala.collection.Map;
 
 
 import static spark.Spark.*;
@@ -33,7 +34,6 @@ public class WebService {
         before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
 
-
         // Definizione del percorso per le chiamate HTTP GET
         get("/hello", (request, response) -> {
             return "Hello World!";
@@ -46,9 +46,12 @@ public class WebService {
         });
 
         get("/nationalityScore", (request, response) -> {
-            // Conversione della mappa in JSON
-            return mapper.writeValueAsString(NationalityScoreAnalysis.getNationalityScore());
+            System.out.println("Chiamata pervenuta");
+            Map<String, Object> result = NationalityScoreAnalysis.getNationalityScore();
+            System.out.println("Chiamata in invio");
+            return result;
         });
+
     }
 }
 
