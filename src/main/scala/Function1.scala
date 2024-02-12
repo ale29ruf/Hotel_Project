@@ -1,16 +1,26 @@
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
+import scala.collection.Map
 
 // 1) Analizzare i commenti negativi in base alla nazionalità. Dunque capire le preferenze e i confort richiesti per una data nazione.
 
 object Function1 {
 
   // Esiste un modo piu' elegante per introdurre le parole da escludere?
-  private val importantWords = Set("backyard", "room", "rooms", "clean", "hotel", "aircondition", "windows",
-    "window", "floor", "dirty", "tv", "fridge", "fridges", "restaurant", "food", "breakfast",
-    "lunch", "dinner", "neighbors", "noisy", "door", "doors", "smell", "smelly", "glass", "shower")
+  private val importantWords = Set("backyard", "room", "clean", "hotel", "aircondition",
+    "window", "floor", "dirty", "tv", "fridge", "restaurant", "food", "breakfast",
+    "lunch", "dinner", "neighbors", "noisy", "door", "smell", "glass", "shower")
+  // rooms, windows, fridges, doors, smelly
 
-  def eseguiAnalisi(dataFrame: DataFrame): Unit = {
+  def eseguiAnalisi(): Map[String, List[(String, Double)]] = {
+    val spark: SparkSession = SparkSession.builder().appName("HotelApp")
+      .config("spark.master", "local") // Esempio: esegui in modalità locale
+      .getOrCreate()
+
+    val dataFrame = spark.read
+      .option("header", "true")
+      .csv("database/Hotel_Reviews.csv")
+
     val colsOfInterest = dataFrame.select("Reviewer_Nationality", "Negative_Review")
 
     val nationCnt = dataFrame.select("Reviewer_Nationality").rdd
@@ -44,17 +54,19 @@ object Function1 {
     // Rapporto ogni conteggio di ogni parola per il numero di reviewers della corrispondente nazionalità
     val rapportedRdd = rddOrdinato.join(nationCnt).mapValues(
       element => element._1.map(
-        { case (parola, conteggio) => (parola, (conteggio.toDouble / element._2)*100 ) }))
-
+        { case (parola, conteggio) => (parola, (conteggio.toDouble / element._2)*100 ) }).toList)
+      .filter { case (_, lista) => lista.nonEmpty }
 
     // Stampa i risultati
     stampaRisultati(rapportedRdd)
 
-    println("--------------END-OUTPUT--------------")
+    spark.stop()
+    rapportedRdd.collectAsMap()
+
   }
 
 
-  private def stampaRisultati(rddOrdinato: RDD[(String, Seq[(String,Double)])]): Unit = {
+  private def stampaRisultati(rddOrdinato: RDD[(String, List[(String,Double)])]): Unit = {
     rddOrdinato.foreach { case (chiave, mappa) =>
       println(s"Chiave: $chiave")
       mappa.foreach { case (parola, conteggio) =>
