@@ -2,7 +2,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import scala.collection.Map
 
-// 1) Analizzare i commenti negativi in base alla nazionalità. Dunque capire le preferenze e i confort richiesti per una data nazione.
+// 1) Analizzare i commenti negativi in base alla nazionalità richiesta. Dunque capire le preferenze e i confort richiesti per una data nazione.
 
 object Function1 {
 
@@ -12,24 +12,25 @@ object Function1 {
     "lunch", "dinner", "neighbors", "noisy", "door", "smell", "glass", "shower")
   // rooms, windows, fridges, doors, smelly
 
-  def eseguiAnalisi(): Map[String, List[(String, Double)]] = {
-    val spark: SparkSession = SparkSession.builder().appName("HotelApp")
-      .config("spark.master", "local") // Esempio: esegui in modalità locale
-      .getOrCreate()
 
-    val dataFrame = spark.read
-      .option("header", "true")
-      .csv("database/Hotel_Reviews.csv")
+  def eseguiAnalisi(nationality: String): Map[String, List[(String, Double)]] = {
 
-    val colsOfInterest = dataFrame.select("Reviewer_Nationality", "Negative_Review")
+    val colsOfInterest = WebService.dataFrame.select("Reviewer_Nationality", "Negative_Review")
 
-    val nationCnt = dataFrame.select("Reviewer_Nationality").rdd
-      .map(word => (word.getString(0), 1))
+    val nationalityMod = " "+nationality+" "
+
+    val nationCnt = WebService.dataFrame.select("Reviewer_Nationality").rdd
+      .map(row => row.getString(0))
+      .filter(_ == nationalityMod) // filtraggio in base alla nazionalità passata
+      .map(word => (word, 1))
       .reduceByKey(_ + _)
 
 
+    println("Conteggio nazione" + nationCnt.count)
+
     val rdd_map = colsOfInterest.rdd
       .map(row => ( row.getString(0), row.getString(1) ))
+      .filter { case (firstString, _) => firstString == nationalityMod } // filtraggio in base alla nazionalità passata
       .mapValues(value => value
           .split("\\s+")
           .filter(word => importantWords.contains(word)).mkString(" "))
@@ -55,14 +56,12 @@ object Function1 {
     val rapportedRdd = rddOrdinato.join(nationCnt).mapValues(
       element => element._1.map(
         { case (parola, conteggio) => (parola, (conteggio.toDouble / element._2)*100 ) }).toList)
-      .filter { case (_, lista) => lista.nonEmpty }
+      //.filter { case (_, lista) => lista.nonEmpty }
 
     // Stampa i risultati
     stampaRisultati(rapportedRdd)
 
-    spark.stop()
     rapportedRdd.collectAsMap()
-
   }
 
 
