@@ -26,8 +26,6 @@ object Function1 {
       .reduceByKey(_ + _)
 
 
-    println("Conteggio nazione" + nationCnt.count)
-
     val rdd_map = colsOfInterest.rdd
       .map(row => ( row.getString(0), row.getString(1) ))
       .filter { case (firstString, _) => firstString == nationalityMod } // filtraggio in base alla nazionalità passata
