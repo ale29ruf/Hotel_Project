@@ -1,5 +1,4 @@
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql._
 import scala.collection.Map
 
 // 1) Analizzare i commenti negativi in base alla nazionalità richiesta. Dunque capire le preferenze e i confort richiesti per una data nazione.

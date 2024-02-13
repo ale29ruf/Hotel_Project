@@ -58,6 +58,9 @@ public class WebService {
 
         get("/Function1/:nationality", (request, response) -> mapper.writeValueAsString(Function1.eseguiAnalisi(request.params(":nationality"))));
 
+        get("Function2/:nationality", (request, response) -> mapper.writeValueAsString(Function2.eseguiAnalisi(request.params(":nationality"))));
+
+        get("GetAllNationality", (request, response) -> mapper.writeValueAsString(GetNationalityReviewers.get()));
     }
 }
 
