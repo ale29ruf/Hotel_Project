@@ -19,7 +19,13 @@ object ClusteringHotelScore{
   def main(args: Array[String]){
     val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
     val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
-
+    /*
+         - SparkSession.builder: Inizia la costruzione di un oggetto SparkSession
+         - master("local[*]"): Imposta la modalità di esecuzione di Spark.
+         Spark utilizzerà tutti i core disponibili sulla macchina locale per l'esecuzione.
+         - appName("HotelReviewsAnalysis"): Assegna un nome all 'applicazione Spark in esecuzione
+         - getOrCreate(): Restituisce o crea un oggetto SparkSession
+        */
 
     val dati: DataFrame = spark.read
       .option("header", "true") // Se la prima riga è l'intestazione

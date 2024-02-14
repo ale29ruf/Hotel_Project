@@ -49,6 +49,11 @@ public class WebService {
             // Conversione della mappa in JSON
             return mapper.writeValueAsString(Function1.eseguiAnalisi());
         });
+
+        get("/nationality", (request, response) -> {
+            // Conversione della mappa in JSON
+            return mapper.writeValueAsString(NationalityScoreAnalysis.getAllNationality());
+        });
     }
 }
 
