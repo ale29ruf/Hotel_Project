@@ -83,5 +83,15 @@ object Function5 {
       .join(RDD_Nazione_Percent_GOOD)
       .mapValues{case  ((v1, v2), v3)=> (v1, v2, v3)}
     RDD_Nazione_Values.collectAsMap()
+    /*
+    val prova: Map[String, (Double, Double, Double)] = Map(
+      "Italy" -> (0.2, 0.7, 0.1),
+      "France" -> (0.2, 0.7, 0.1),
+      "Kingdom" -> (0.2, 0.7, 0.1),
+      "Netherlands" -> (0.2, 0.7, 0.1),
+      "Austria" -> (0.2, 0.7, 0.1),
+      "Spain" -> (0.2, 0.7, 0.1))
+      prova
+    */
   }
 }
