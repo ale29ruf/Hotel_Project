@@ -45,15 +45,23 @@ public class WebService {
             return mapper.writeValueAsString(NationalityScoreAnalysis.getNationalityScore());
         });
 
+        get("/nationality", (request, response) -> {
+            // Conversione della mappa in JSON
+            return mapper.writeValueAsString(NationalityScoreAnalysis.getAllNationality());
+        });
+
+        get("/Function5", (request, response) -> {
+            // Conversione della mappa in JSON
+            return mapper.writeValueAsString(Function5.eseguiAnalisi());
+        });
+
+
         get("/Function1", (request, response) -> {
             // Conversione della mappa in JSON
             return mapper.writeValueAsString(Function1.eseguiAnalisi());
         });
 
-        get("/nationality", (request, response) -> {
-            // Conversione della mappa in JSON
-            return mapper.writeValueAsString(NationalityScoreAnalysis.getAllNationality());
-        });
+
     }
 }
 

@@ -3,10 +3,10 @@ import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SparkSession}
 
-class ClusteringHotelScore {
+class Function5 {
 }
 
-object ClusteringHotelScore{
+object Function5 {
 
   private def nation(s: String) = {
     val list_splitted: Array[String] = s.split(" ")
@@ -16,7 +16,7 @@ object ClusteringHotelScore{
   }
 
 
-  def main(args: Array[String]){
+  def eseguiAnalisi: collection.Map[String, (Double, Double, Double)]={
     val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
     val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
     /*
@@ -43,6 +43,10 @@ object ClusteringHotelScore{
 
     val kmeans = new KMeans().setK(3).setSeed(1L).setPredictionCol("prediction")
     val model = kmeans.fit(assembledScores)
+
+    //Mostra i centroidi dei cluster
+    println("Cluster Centers: ")
+    model.clusterCenters.foreach(println)
 
     val dataFrameClassified: DataFrame = model.transform(assembledScores)
 
@@ -74,18 +78,10 @@ object ClusteringHotelScore{
     val RDD_Nazione_Percent_INTERMEDIATE = RDD_Nazione_INTERMEDIATE.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
     val RDD_Nazione_Percent_BAD = RDD_Nazione_BAD.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
 
-
-    println("---Percentuale hotel buoni per nazione---")
-    RDD_Nazione_Percent_GOOD.foreach(println)
-
-    println("---Percentuale hotel intermedi per nazione---")
-    RDD_Nazione_Percent_INTERMEDIATE.foreach(println)
-
-    println("---Percentuale hotel scarsi per nazione---")
-    RDD_Nazione_Percent_BAD.foreach(println)
-
-    //Mostra i centroidi dei cluster
-    println("Cluster Centers: ")
-    model.clusterCenters.foreach(println)
+    val RDD_Nazione_Values = RDD_Nazione_Percent_BAD
+      .join(RDD_Nazione_Percent_INTERMEDIATE)
+      .join(RDD_Nazione_Percent_GOOD)
+      .mapValues{case  ((v1, v2), v3)=> (v1, v2, v3)}
+    RDD_Nazione_Values.collectAsMap()
   }
 }
