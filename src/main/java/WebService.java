@@ -1,10 +1,21 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.scala.DefaultScalaModule;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 
 
 import static spark.Spark.*;
 
 public class WebService {
+
+    private static final SparkSession sparkContext = SparkSession.builder().appName("HotelApp")
+            .config("spark.master", "local") // Esempio: esegui in modalità locale
+            .getOrCreate();
+
+    public static Dataset<Row> dataFrame = sparkContext.read()
+            .option("header", "true")
+            .csv("database/Hotel_Reviews.csv");
 
 
     public static void main(String[] args) {
@@ -45,6 +56,12 @@ public class WebService {
             return mapper.writeValueAsString(NationalityScoreAnalysis.getNationalityScore());
         });
 
+        get("/Function1/:nationality", (request, response) -> mapper.writeValueAsString(Function1.eseguiAnalisi(request.params(":nationality"))));
+
+        get("/Function2", (request, response) -> mapper.writeValueAsString(Function2.eseguiAnalisi()));
+
+        get("GetAllNationality", (request, response) -> mapper.writeValueAsString(GetNationalityReviewers.get()));
+
         get("/nationality", (request, response) -> {
             // Conversione della mappa in JSON
             return mapper.writeValueAsString(NationalityScoreAnalysis.getAllNationality());
@@ -55,11 +72,6 @@ public class WebService {
             return mapper.writeValueAsString(Function5.eseguiAnalisi());
         });
 
-
-        get("/Function1", (request, response) -> {
-            // Conversione della mappa in JSON
-            return mapper.writeValueAsString(Function1.eseguiAnalisi());
-        });
 
 
     }

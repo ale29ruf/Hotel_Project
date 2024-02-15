@@ -2,6 +2,7 @@ import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
+import scala.collection.Map
 
 // 4) Se il rewiever ha molti Total_Number_of_Reviews_Reviewer_Has_Given allora potrebbe essere uno che scrive
 // recensioni tanto per. Dunque la sua recensione potrebbe essere poco affidabile.
@@ -11,15 +12,16 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 object Function2 {
 
-  def eseguiAnalisi(dataFrame: DataFrame): Unit = {
+  def eseguiAnalisi(): Map[String, Map[String, Double]] = {
 
     // Pre-processing dati
-    val lenRevWithTotRev = dataFrame.select("Review_Total_Negative_Word_Counts", "Review_Total_Positive_Word_Counts").rdd
+    val lenRevWithTotRev = WebService.dataFrame.select("Review_Total_Negative_Word_Counts", "Review_Total_Positive_Word_Counts").rdd
       .map(row => {
         val negCnt = row.getString(0).toInt
         val posCnt = row.getString(1).toInt
         negCnt + posCnt })
-      .zip(dataFrame.select("Total_Number_of_Reviews_Reviewer_Has_Given").rdd.map(_.getString(0).toInt))
+      .zip(WebService.dataFrame.select("Total_Number_of_Reviews_Reviewer_Has_Given").rdd.map(_.getString(0).toInt))
+
 
     // Occorre convertire revWithTotRev: RDD[(Int, Int)] in un dataFrame per poter usare l'algoritmo di k-means
     // Definiamo prima lo schema che avrà il nuovo dataFrame
@@ -59,7 +61,7 @@ object Function2 {
     // Lo schema del dataFrame predictions è il seguente:
     // StructType(StructField(ReviewLength,IntegerType,true),StructField(Total_Number_of_Reviews,IntegerType,true),StructField(features,org.apache.spark.ml.linalg.VectorUDT@3bfc3ba7,true),StructField(classification,IntegerType,false))
 
-    val nationalityClass = dataFrame.select("Reviewer_Nationality").rdd.map(_.getString(0))
+    val nationalityClass = WebService.dataFrame.select("Reviewer_Nationality").rdd.map(_.getString(0))
       .zip(classifyDataset.select("classification").rdd.map(_.getInt(0).toString))
 
 
@@ -75,7 +77,7 @@ object Function2 {
     //(Saint Martin, Map(0 -> 4))
 
     // Ripondero i conteggi
-    val wordCountsNationality = dataFrame.select("Reviewer_Nationality").rdd
+    val wordCountsNationality = WebService.dataFrame.select("Reviewer_Nationality").rdd
       .map(row => row.getString(0))
       .map(word => (word, 1))
       .reduceByKey(_ + _)
@@ -84,12 +86,14 @@ object Function2 {
       .map { case (key, (map, totRevNat)) =>
       val repoundedMap = map.view.mapValues( count => (count.toDouble / totRevNat) * 100 ).toMap // divido ogni valore intero della mappa per il numero totale di viewer per quella stessa nazionalità
       (key, repoundedMap) }
+      //.filter { case (nation, _) => nation == " "+nationality+" " }
 
     // Segue la stampa delle prime 3 nazionalità:
     // (Jersey, Map(1 -> 2.4333719582850524, 0 -> 75.89803012746235, 2 -> 21.668597914252608))
     // (Liberia, Map(0 -> 66.66666666666666, 2 -> 33.33333333333333))
     // (Uzbekistan, Map(0 -> 85.0, 2 -> 15.0))
 
+    repoundResult.collectAsMap()
   }
 
 }
