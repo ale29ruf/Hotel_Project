@@ -21,7 +21,7 @@ object NationalityScoreAnalysis{
 
 
     val nationalityCount: RDD[(String, Int)] = coppieNationalityScore.map { case (chiave, _) => (chiave, 1) }.reduceByKey((a, b) => a + b)
-      .filter { case (_, valore) => valore > 5000 }
+     // .filter { case (_, valore) => valore > 5000 }
     val nationalitySumScore: RDD[(String, Double)] = coppieNationalityScore.reduceByKey((a, b) => a + b)
 
     val nationalityMeanScore = nationalitySumScore.join(nationalityCount).map { case (chiave, (sum, count)) => (chiave, sum / count) }
@@ -29,5 +29,19 @@ object NationalityScoreAnalysis{
 
     nationalityMeanScore.take(30).foreach(println)
     nationalityMeanScore.collectAsMap()
+  }
+
+  def getAllNationality(): Array[String] = {
+    val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
+    val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
+
+
+    val dati: DataFrame = spark.read
+      .option("header", "true") // Se la prima riga è l'intestazione
+      .option("inferSchema", "true") // Inferisci automaticamente il tipo di dati delle colonne
+      .csv(inputFile)
+
+    dati.rdd.map(riga => riga.getAs[String]("Reviewer_Nationality")).distinct()
+      .sortBy(identity).filter( x=> x!=" ").collect()
   }
 }

@@ -61,6 +61,19 @@ public class WebService {
         get("/Function2", (request, response) -> mapper.writeValueAsString(Function2.eseguiAnalisi()));
 
         get("GetAllNationality", (request, response) -> mapper.writeValueAsString(GetNationalityReviewers.get()));
+
+        get("/nationality", (request, response) -> {
+            // Conversione della mappa in JSON
+            return mapper.writeValueAsString(NationalityScoreAnalysis.getAllNationality());
+        });
+
+        get("/Function5", (request, response) -> {
+            // Conversione della mappa in JSON
+            return mapper.writeValueAsString(Function5.eseguiAnalisi());
+        });
+
+
+
     }
 }
 
