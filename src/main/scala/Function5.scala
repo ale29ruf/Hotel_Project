@@ -17,6 +17,7 @@ object Function5 {
 
 
   def eseguiAnalisi: collection.Map[String, (Double, Double, Double)]={
+    /*
     val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
     val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
     /*
@@ -83,7 +84,7 @@ object Function5 {
       .join(RDD_Nazione_Percent_GOOD)
       .mapValues{case  ((v1, v2), v3)=> (v1, v2, v3)}
     RDD_Nazione_Values.collectAsMap()
-    /*
+    */
     val prova: Map[String, (Double, Double, Double)] = Map(
       "Italy" -> (0.2, 0.7, 0.1),
       "France" -> (0.2, 0.7, 0.1),
@@ -92,6 +93,5 @@ object Function5 {
       "Austria" -> (0.2, 0.7, 0.1),
       "Spain" -> (0.2, 0.7, 0.1))
       prova
-    */
   }
 }
