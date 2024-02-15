@@ -12,7 +12,7 @@ import scala.collection.Map
 
 object Function2 {
 
-  def eseguiAnalisi(nationality: String): Map[String, Map[String, Double]] = {
+  def eseguiAnalisi(): Map[String, Map[String, Double]] = {
 
     // Pre-processing dati
     val lenRevWithTotRev = WebService.dataFrame.select("Review_Total_Negative_Word_Counts", "Review_Total_Positive_Word_Counts").rdd
@@ -86,7 +86,7 @@ object Function2 {
       .map { case (key, (map, totRevNat)) =>
       val repoundedMap = map.view.mapValues( count => (count.toDouble / totRevNat) * 100 ).toMap // divido ogni valore intero della mappa per il numero totale di viewer per quella stessa nazionalità
       (key, repoundedMap) }
-      .filter { case (nation, _) => nation == " "+nationality+" " }
+      //.filter { case (nation, _) => nation == " "+nationality+" " }
 
     // Segue la stampa delle prime 3 nazionalità:
     // (Jersey, Map(1 -> 2.4333719582850524, 0 -> 75.89803012746235, 2 -> 21.668597914252608))
