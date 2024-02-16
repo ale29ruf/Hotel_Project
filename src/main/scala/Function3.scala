@@ -11,10 +11,10 @@ object Function3 {
   //2) Associazione hotel -> top 10 tag
   //3) Selezione top 5 tag piu' frequenti per ogni hotel (con relativo hotel che sarebbe la chiave della coppia)
 
-  def eseguiAnalisi(dataFrame: DataFrame): Unit = {
+  def eseguiAnalisi(): Array[(String, Seq[String])] = {
 
     //1) Estrazione 10 top tag
-    val topTags = dataFrame.rdd
+    val topTags = WebService.dataFrame.rdd
       .map(value => value.getAs[String]("Tags"))
       .map(item => item.split(",")) //Suddivido per virgole
       .flatMap(array => array.map(stringa => cleanStringa(stringa).trim)) //Ripulisco ogni stringa di ogni array
@@ -23,7 +23,7 @@ object Function3 {
       .sortBy(_._2, ascending = false)
       .take(10)
 
-    val hotelTags = dataFrame.select("Hotel_Address", "Tags")
+    val hotelTags = WebService.dataFrame.select("Hotel_Address", "Tags")
 
     // 2) Associazione hotel -> top 5 tag
     val countHotelTags = hotelTags.rdd
@@ -47,8 +47,13 @@ object Function3 {
       .mapValues( seq => seq
         .filter { case (key, _) => tagsToExtract.contains(key) }
         .take(5))
+    // rimuovo la frequenza per ogni tag dal momento che sono ordinati già per frequenza
+      .map { case (hotel, seq) =>
+        val newSeq: Seq[String] = seq.map { case (tag, _) => tag }
+        (hotel, newSeq)
+      }
 
-
+    result.collect()
   }
 
 }

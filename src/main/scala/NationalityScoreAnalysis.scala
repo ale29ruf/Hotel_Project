@@ -31,8 +31,8 @@ object NationalityScoreAnalysis{
     nationalityMeanScore.collectAsMap()
   }
 
-  def getAllNationality(): Array[String] = {
-    val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
+  def getAllNationality: Array[String] = {
+    val inputFile = "C:\\Users\\aless\\Desktop\\untitled_Hotel\\database\\Hotel_Reviews.csv"
     val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
 
 
