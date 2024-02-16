@@ -52,7 +52,6 @@ public class WebService {
         });
 
         get("/nationalityScore", (request, response) -> {
-            // Conversione della mappa in JSON
             return mapper.writeValueAsString(NationalityScoreAnalysis.getNationalityScore());
         });
 
@@ -62,17 +61,13 @@ public class WebService {
 
         get("GetAllNationality", (request, response) -> mapper.writeValueAsString(GetNationalityReviewers.get()));
 
-        get("/nationality", (request, response) -> {
-            // Conversione della mappa in JSON
-            return mapper.writeValueAsString(NationalityScoreAnalysis.getAllNationality());
-        });
+        get("/nationality", (request, response) -> mapper.writeValueAsString(NationalityScoreAnalysis.getAllNationality()));
 
-        get("/Function5", (request, response) -> {
-            // Conversione della mappa in JSON
-            return mapper.writeValueAsString(Function5.eseguiAnalisi());
-        });
+        get("/Function5", (request, response) -> mapper.writeValueAsString(Function5.eseguiAnalisi()));
 
+        get("GetAllTags", (request, response) -> mapper.writeValueAsString(GetTags.get()));
 
+        get("/Function3", (request, response) -> mapper.writeValueAsString(Function3.eseguiAnalisi()));
 
     }
 }
