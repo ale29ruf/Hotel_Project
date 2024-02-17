@@ -1,8 +1,9 @@
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-class TagsAssociationAnalysis {
-}
-object TagsAssociationAnalysis{
+
+import scala.annotation.unused
+
+object Function6{
 
   def getAllPairs(strings: Array[String]):Array[(String, String)]  =
   {
@@ -19,7 +20,9 @@ object TagsAssociationAnalysis{
       val cleanedStringa = stringa.replaceAll(regex, " ")
       cleanedStringa
   }
-  def main(args: Array[String]) {
+  def eseguiAnalisi: List[List[String]] ={
+
+
     val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
     val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
 
@@ -35,8 +38,8 @@ object TagsAssociationAnalysis{
       .map( array=> array.map(stringa =>cleanStringa(stringa).trim)) //Ripulisco ogni stringa di ogni array
 
     val coppie: RDD[(String,String)] = items.filter( item => item.length>=2).flatMap(item => getAllPairs(item))
-    val coppieOcc: RDD[(String, Int)]= coppie.map(coppia =>(coppia._1+ "---" +coppia._2, 1)).reduceByKey((a, b)=> a+b)
-    val ordCoppieOcc: RDD[(String, Int)] = coppieOcc.sortBy( coppia=> coppia._2, ascending=false)
-    ordCoppieOcc.take(30).foreach(println)
+    val coppieOcc: RDD[(List[String], Int)]= coppie.map(coppia =>(List(coppia._1, coppia._2), 1)).reduceByKey((a, b)=> a+b)
+    val ordCoppieOcc: RDD[List[String]] = coppieOcc.sortBy( coppia=> coppia._2, ascending=false).map{ case (a,_)=>a}
+    ordCoppieOcc.collect().toList.take(45)
   }
 }

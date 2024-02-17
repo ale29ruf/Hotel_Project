@@ -1,4 +1,4 @@
-import TagsAssociationAnalysis.cleanStringa
+import Function6.cleanStringa
 import org.apache.spark.rdd.RDD
 
 object GetTags {

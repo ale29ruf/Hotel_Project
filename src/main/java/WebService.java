@@ -3,6 +3,11 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import scala.Tuple2;
+import scala.Tuple3;
+import scala.collection.Map;
+import scala.collection.immutable.List;
+import scala.collection.immutable.Seq;
 
 
 import static spark.Spark.*;
@@ -12,16 +17,17 @@ public class WebService {
     private static final SparkSession spark = SparkSession.builder().appName("HotelApp")
             .config("spark.master", "local") // esegui in modalità locale
             .getOrCreate();
-    /*
+
     public static Dataset<Row> dataFrame = spark.read()
             .option("header", "true")
             .csv("database/Hotel_Reviews.csv");
-    */
+
+    /*
     public static Dataset<Row> dataFrame = spark.read()
             .option("header", "true") // Se la prima riga è l'intestazione
             .option("inferSchema", "true") // Inferisci automaticamente il tipo di dati delle colonne
             .csv("database/Hotel_Reviews.csv");
-
+    */
     public static void main(String[] args) {
         // Specifica la porta personalizzata (ad esempio, 8080)
         port(8080);
@@ -62,9 +68,11 @@ public class WebService {
 
         get("GetAllNationality", (request, response) -> mapper.writeValueAsString(GetNationalityReviewers.get()));
 
-        get("GetAllTags", (request, response) -> mapper.writeValueAsString(GetTags.get()));
+        List<String> tags=GetTags.get();
+        get("GetAllTags", (request, response) -> mapper.writeValueAsString(tags));
 
-        get("/Function3", (request, response) -> mapper.writeValueAsString(Function3.eseguiAnalisi()));
+        Tuple2<String, Seq<String>>[] fun3 = Function3.eseguiAnalisi();
+        get("/Function3", (request, response) -> mapper.writeValueAsString(fun3));
 
         //-------------------------------------------------------------------------------------------
 
@@ -72,7 +80,11 @@ public class WebService {
 
         get("/nationality", (request, response) -> mapper.writeValueAsString(Function4.getAllNationality()));
 
-        get("/Function5", (request, response) -> mapper.writeValueAsString(Function5.eseguiAnalisi()));
+        Map<String, Tuple3<Object, Object, Object>> fun5 = Function5.eseguiAnalisi();
+        get("/Function5", (request, response) -> mapper.writeValueAsString(fun5));
+
+        List<List<String>> fun6=Function6.eseguiAnalisi();
+        get("/Function6", (request, response) -> mapper.writeValueAsString(fun6));
 
     }
 }
