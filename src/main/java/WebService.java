@@ -61,12 +61,14 @@ public class WebService {
             return "Hello, " + name + "!";
         });
 
+        Map<String, List<Tuple2<String, Object>>> func1 = Function1.eseguiAnalisi();
+        get("/Function1/:nationality", (request, response) -> mapper.writeValueAsString(func1.get(" "+request.params(":nationality")+" ")));
 
-        get("/Function1/:nationality", (request, response) -> mapper.writeValueAsString(Function1.eseguiAnalisi(request.params(":nationality"))));
+        Map<String, Map<String, Object>> func2 = Function2.eseguiAnalisi();
+        get("/Function2", (request, response) -> mapper.writeValueAsString(func2));
 
-        get("/Function2", (request, response) -> mapper.writeValueAsString(Function2.eseguiAnalisi()));
-
-        get("GetAllNationality", (request, response) -> mapper.writeValueAsString(GetNationalityReviewers.get()));
+        List<String> nation = GetNationalityReviewers.get();
+        get("GetAllNationality", (request, response) -> mapper.writeValueAsString(nation));
 
         List<String> tags=GetTags.get();
         get("GetAllTags", (request, response) -> mapper.writeValueAsString(tags));
@@ -83,8 +85,8 @@ public class WebService {
         Map<String, Tuple3<Object, Object, Object>> fun5 = Function5.eseguiAnalisi();
         get("/Function5", (request, response) -> mapper.writeValueAsString(fun5));
 
-        List<List<String>> fun6=Function6.eseguiAnalisi();
-        get("/Function6", (request, response) -> mapper.writeValueAsString(fun6));
+        //List<List<String>> fun6=Function6.eseguiAnalisi();
+        //get("/Function6", (request, response) -> mapper.writeValueAsString(fun6));
 
     }
 }
