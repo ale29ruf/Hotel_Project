@@ -22,16 +22,7 @@ object Function6{
   }
   def eseguiAnalisi: List[List[String]] ={
 
-
-    val inputFile = "C:\\Users\\asus\\Desktop\\progetto_big_data\\Hotel_Reviews.csv"
-    val spark = SparkSession.builder.master("local[*]").appName("HotelReviewsAnalysis").getOrCreate()
-
-
-    val dati: DataFrame = spark.read
-      .option("header", "true") // Se la prima riga è l'intestazione
-      .option("inferSchema", "true") // Inferisci automaticamente il tipo di dati delle colonne
-      .csv(inputFile)
-
+    val dati=WebService.dataFrame
 
     val items: RDD[Array[String]]= dati.rdd.map (riga => riga.getAs[String]("Tags"))
       .map(item => item.split(","))  //Suddivido per virgole
