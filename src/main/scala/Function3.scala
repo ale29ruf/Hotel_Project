@@ -30,8 +30,7 @@ object Function3 {
       .map(row => ( row.getString(0), row.getString(1) ))
       .mapValues { tags => tags
         .split(",") //Suddivido per virgole
-        .map(stringa => cleanStringa(stringa).trim)
-      }
+        .map(stringa => cleanStringa(stringa).trim) }
       .groupByKey()
       .mapValues( iter => iter
         .flatten

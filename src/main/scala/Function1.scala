@@ -1,4 +1,6 @@
 import org.apache.spark.rdd.RDD
+import org.apache.spark.storage.StorageLevel
+
 import scala.collection.Map
 
 // 1) Analizzare i commenti negativi in base alla nazionalità richiesta. Dunque capire le preferenze e i confort richiesti per una data nazione.
@@ -23,6 +25,7 @@ object Function1 {
       .filter(_ == nationalityMod) // filtraggio in base alla nazionalità passata
       .map(word => (word, 1))
       .reduceByKey(_ + _)
+      .persist(StorageLevel.MEMORY_ONLY) // Caching
 
 
     val rdd_map = colsOfInterest.rdd
@@ -48,6 +51,7 @@ object Function1 {
     }
 
     val rddOrdinato = valuesWordCount.mapValues(_.toSeq.sortBy(-_._2))
+
 
     // Rapporto ogni conteggio di ogni parola per il numero di reviewers della corrispondente nazionalità
     val rapportedRdd = rddOrdinato.join(nationCnt).mapValues(
