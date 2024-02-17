@@ -18,7 +18,7 @@ object Function5 {
 
   def eseguiAnalisi: collection.Map[String, (Double, Double, Double)]={
 
-    val dati=WebService.dataFrame
+    val dati=WebService.dataFrame1
 
     val dati_distinti_per_hotel: DataFrame= dati.dropDuplicates("Hotel_Address")
 
