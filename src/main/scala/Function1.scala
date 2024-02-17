@@ -20,13 +20,6 @@ object Function1 {
 
     val nationalityMod = " "+nationality+" "
 
-    val nationCnt = WebService.dataFrame.select("Reviewer_Nationality").rdd
-      .map(row => row.getString(0))
-      .filter(_ == nationalityMod) // filtraggio in base alla nazionalità passata
-      .map(word => (word, 1))
-      .reduceByKey(_ + _)
-      .persist(StorageLevel.MEMORY_ONLY) // Caching
-
 
     val rdd_map = colsOfInterest.rdd
       .map(row => ( row.getString(0), row.getString(1) ))
@@ -51,6 +44,13 @@ object Function1 {
     }
 
     val rddOrdinato = valuesWordCount.mapValues(_.toSeq.sortBy(-_._2))
+
+    val nationCnt = WebService.dataFrame.select("Reviewer_Nationality").rdd
+      .map(row => row.getString(0))
+      .filter(_ == nationalityMod) // filtraggio in base alla nazionalità passata
+      .map(word => (word, 1))
+      .reduceByKey(_ + _)
+      .persist(StorageLevel.MEMORY_ONLY) // Caching
 
 
     // Rapporto ogni conteggio di ogni parola per il numero di reviewers della corrispondente nazionalità
