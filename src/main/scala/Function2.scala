@@ -17,12 +17,16 @@ object Function2 {
   def eseguiAnalisi(): Map[String, Map[String, Double]] = {
 
     // Pre-processing dati
-    val lenRevWithTotRev = WebService.dataFrame.select("Review_Total_Negative_Word_Counts", "Review_Total_Positive_Word_Counts").rdd
+    val lenRevWithTotRev = WebService.dataFrame.select("Review_Total_Negative_Word_Counts",
+      "Review_Total_Positive_Word_Counts").rdd
       .map(row => {
         val negCnt = row.getString(0).toInt
         val posCnt = row.getString(1).toInt
         negCnt + posCnt })
-      .zip(WebService.dataFrame.select("Total_Number_of_Reviews_Reviewer_Has_Given").rdd.map(_.getString(0).toInt))
+      .zip(
+        WebService.dataFrame.select("Total_Number_of_Reviews_Reviewer_Has_Given").rdd
+          .map(_.getString(0).toInt)
+      )
 
 
     // Occorre convertire revWithTotRev: RDD[(Int, Int)] in un dataFrame per poter usare l'algoritmo di k-means
@@ -64,13 +68,17 @@ object Function2 {
     // StructType(StructField(ReviewLength,IntegerType,true),StructField(Total_Number_of_Reviews,IntegerType,true),StructField(features,org.apache.spark.ml.linalg.VectorUDT@3bfc3ba7,true),StructField(classification,IntegerType,false))
 
     val nationalityClass = WebService.dataFrame.select("Reviewer_Nationality").rdd.map(_.getString(0))
-      .zip(classifyDataset.select("classification").rdd.map(_.getInt(0).toString))
+      .zip(
+        classifyDataset.select("classification").rdd.map(_.getInt(0).toString)
+      )
 
 
     // Eseguo operazioni sulle coppie (nazionalità, classificazione)
     // Eseguo conteggio delle classi per ogni nazionalità di reviewer
     val result = nationalityClass.groupByKey()
-      .mapValues(_.flatMap(_.split("\\s+")).groupBy(identity).view.mapValues(_.size).toMap)
+      .mapValues(
+        _.flatMap(_.split("\\s+"))
+          .groupBy(identity).view.mapValues(_.size).toMap)
 
     // Segue il conteggio per le prime 4 nazioni:
     //(Jersey, Map(1 -> 21, 0 -> 655, 2 -> 187))
