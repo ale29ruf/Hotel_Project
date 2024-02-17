@@ -22,12 +22,12 @@ public class WebService {
             .option("header", "true")
             .csv("database/Hotel_Reviews.csv");
 
-    /*
-    public static Dataset<Row> dataFrame = spark.read()
+
+    public static Dataset<Row> dataFrame1 = spark.read()
             .option("header", "true") // Se la prima riga è l'intestazione
             .option("inferSchema", "true") // Inferisci automaticamente il tipo di dati delle colonne
             .csv("database/Hotel_Reviews.csv");
-    */
+
     public static void main(String[] args) {
         // Specifica la porta personalizzata (ad esempio, 8080)
         port(8080);
@@ -61,12 +61,14 @@ public class WebService {
             return "Hello, " + name + "!";
         });
 
+        Map<String, List<Tuple2<String, Object>>> func1 = Function1.eseguiAnalisi();
+        get("/Function1/:nationality", (request, response) -> mapper.writeValueAsString(func1.get(" "+request.params(":nationality")+" ")));
 
-        get("/Function1/:nationality", (request, response) -> mapper.writeValueAsString(Function1.eseguiAnalisi(request.params(":nationality"))));
+        Map<String, Map<String, Object>> func2 = Function2.eseguiAnalisi();
+        get("/Function2", (request, response) -> mapper.writeValueAsString(func2));
 
-        get("/Function2", (request, response) -> mapper.writeValueAsString(Function2.eseguiAnalisi()));
-
-        get("GetAllNationality", (request, response) -> mapper.writeValueAsString(GetNationalityReviewers.get()));
+        List<String> nation = GetNationalityReviewers.get();
+        get("GetAllNationality", (request, response) -> mapper.writeValueAsString(nation));
 
         List<String> tags=GetTags.get();
         get("GetAllTags", (request, response) -> mapper.writeValueAsString(tags));
