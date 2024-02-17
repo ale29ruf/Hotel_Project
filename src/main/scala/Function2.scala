@@ -2,6 +2,8 @@ import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.storage.StorageLevel
+
 import scala.collection.Map
 
 // 4) Se il rewiever ha molti Total_Number_of_Reviews_Reviewer_Has_Given allora potrebbe essere uno che scrive
@@ -81,6 +83,7 @@ object Function2 {
       .map(row => row.getString(0))
       .map(word => (word, 1))
       .reduceByKey(_ + _)
+      .persist(StorageLevel.MEMORY_ONLY)
 
     val repoundResult = result.join(wordCountsNationality)
       .map { case (key, (map, totRevNat)) =>
