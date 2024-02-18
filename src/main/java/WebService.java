@@ -77,10 +77,11 @@ public class WebService {
         get("/Function3", (request, response) -> mapper.writeValueAsString(fun3));
 
         //-------------------------------------------------------------------------------------------
+        Map<String, Object> fun4 = Function4.eseguiAnalisi();
+        get("/Function4", (request, response) -> mapper.writeValueAsString(fun4));
 
-        get("/Function4", (request, response) -> mapper.writeValueAsString(Function4.eseguiAnalisi()));
-
-        get("/nationality", (request, response) -> mapper.writeValueAsString(Function4.getAllNationality()));
+        Map<String, Tuple3<Object, Object, Object>> nationality = Function5.eseguiAnalisi();
+        get("/nationality", (request, response) -> mapper.writeValueAsString(nationality));
 
         Map<String, Tuple3<Object, Object, Object>> fun5 = Function5.eseguiAnalisi();
         get("/Function5", (request, response) -> mapper.writeValueAsString(fun5));

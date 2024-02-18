@@ -2,8 +2,6 @@ import org.apache.spark.rdd.RDD
 
 //SCORE MEDIO PER NAZIONALITA'
 
-
-
 object Function4{
   def eseguiAnalisi: collection.Map[String, Double] = {
     val dati=WebService.dataFrame
