@@ -17,6 +17,7 @@ object Function4{
     //Conteggio delle recensioni per nazionalità
     val nationalityCount: RDD[(String, Int)] = coppieNationalityScore
       .map { case (chiave, _) => (chiave, 1) }.reduceByKey((a, b) => a + b)
+     // .filter{ case (_, valore)=> valore > 5000 }
 
     //Somma degli score delle recensioni per nazionalità
     val nationalitySumScore: RDD[(String, Double)] = coppieNationalityScore
@@ -26,12 +27,13 @@ object Function4{
     val nationalityMeanScore = nationalitySumScore.join(nationalityCount)
       .map { case (chiave, (sum, count)) => (chiave, sum / count) }
       .sortBy(coppia => coppia._2, ascending = true)
-
+    nationalityMeanScore.foreach(println)
     nationalityMeanScore.collectAsMap()
   }
 
   def getAllNationality: Array[String] = {
     val dati=WebService.dataFrame1
+
     dati.rdd.map(riga => riga.getAs[String]("Reviewer_Nationality")).distinct()
       .sortBy(identity).filter( x=> x!=" ").collect()
   }
