@@ -22,7 +22,7 @@ object Function6{
   }
   def eseguiAnalisi: List[List[String]] ={
 
-    val dati=WebService.dataFrame1.rdd
+    val dati=WebService.dataFrame1
 
     val items: RDD[Array[String]]= dati.rdd.map (riga => riga.getAs[String]("Tags"))
       .map(item => item.split(","))  //Suddivido per virgole
@@ -39,6 +39,7 @@ object Function6{
     val ordCoppieOcc: RDD[List[String]] = coppieOcc
       .sortBy( coppia=> coppia._2, ascending=false)
       .map{ case (a,_)=>a}
-    ordCoppieOcc.collect().toList.take(45)
+    ordCoppieOcc.collect().toList.take(100).foreach(println)
+    ordCoppieOcc.collect().toList.take(100)
   }
 }
