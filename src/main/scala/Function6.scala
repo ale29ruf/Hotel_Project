@@ -24,7 +24,7 @@ object Function6{
 
     val dati=WebService.dataFrame1.rdd
 
-    val items: RDD[Array[String]]= dati.map (riga => riga.getAs[String]("Tags"))
+    val items: RDD[Array[String]]= dati.rdd.map (riga => riga.getAs[String]("Tags"))
       .map(item => item.split(","))  //Suddivido per virgole
       .map( array=> array.map(stringa =>cleanStringa(stringa).trim)) //Ripulisco ogni stringa di ogni array
 
