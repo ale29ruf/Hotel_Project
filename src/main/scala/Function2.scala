@@ -110,6 +110,8 @@ object Function2 {
 
     // Stampa della chiave con il valore '1' più alto
     println("Chiave con il valore '1' più alto: " + keyWithMaxValueOne._1)
+    println("Numero di recensori per la nazionalità più significativa: " +
+      wordCountsNationality.filter(_._1 == keyWithMaxValueOne._1).map(_._2).first())
 
     repoundResult.collectAsMap()
   }
