@@ -28,7 +28,6 @@ object Function1 {
 
 
     val valuesWordCount = rdd_map.mapValues { array =>
-      // Qui puoi eseguire le operazioni desiderate sull'array di stringhe
       // Eseguo word count sul singolo array
       val wordCount = array
         .flatMap(_.split("\\s+")) // la flatMap consente di appiattire gli array di stringhe che genera "split"
@@ -47,7 +46,6 @@ object Function1 {
       .map(word => (word, 1))
       .reduceByKey(_ + _)
       .persist(StorageLevel.MEMORY_ONLY) // Caching
-
 
     // Rapporto ogni conteggio di ogni parola per il numero di reviewers della corrispondente nazionalità
     val rapportedRdd = rddOrdinato.join(nationCnt).mapValues(

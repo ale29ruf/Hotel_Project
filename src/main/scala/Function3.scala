@@ -25,7 +25,6 @@ object Function3 {
 
     val hotelTags = WebService.dataFrame.select("Hotel_Address", "Tags")
 
-    // 2) Associazione hotel -> top 5 tag
     val countHotelTags = hotelTags.rdd
       .map(row => ( row.getString(0), row.getString(1) ))
       .mapValues { tags => tags
