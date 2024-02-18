@@ -22,7 +22,7 @@ object Function6{
   }
   def eseguiAnalisi: List[List[String]] ={
 
-    val dati=WebService.dataFrame
+    val dati=WebService.dataFrame1.rdd
 
     val items: RDD[Array[String]]= dati.map (riga => riga.getAs[String]("Tags"))
       .map(item => item.split(","))  //Suddivido per virgole

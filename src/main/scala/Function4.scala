@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 
 object Function4{
   def eseguiAnalisi: collection.Map[String, Double] = {
-    val dati=WebService.dataFrame
+    val dati=WebService.dataFrame1
     val coppieNationalityScore: RDD[(String, Double)] =
       dati.rdd.map(riga => (riga.getAs[String]("Reviewer_Nationality"),
         riga.getAs[Double]("Reviewer_Score")))
