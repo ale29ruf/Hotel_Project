@@ -28,24 +28,25 @@ object Function5 {
 
     val assembledScores = assembler.transform(dati_distinti_per_hotel)
 
-
     val kmeans = new KMeans().setK(3).setSeed(100).setPredictionCol("prediction")
     val model = kmeans.fit(assembledScores)
+    val dataFrameClassified: DataFrame = model.transform(assembledScores)
 
     //Mostra i centroidi dei cluster
     println("Cluster Centers: ")
     model.clusterCenters.foreach(println)
 
-    val dataFrameClassified: DataFrame = model.transform(assembledScores)
-
 
     // Fornisci un implicit Encoder per il tuo tipo di dato
     implicit val encoder: Encoder[(String, Int)] = Encoders.product[(String, Int)]
 
-    val RDD_Nazione_LEVEL : RDD[(String, Int)]= dataFrameClassified.select("Hotel_Address", "prediction").
+    val RDD_Nazione_LEVEL : RDD[(String, Int)]= dataFrameClassified
+      .select("Hotel_Address", "prediction").
       map(row => (nation(row.getAs[String]("Hotel_Address")), row.getAs[Int]("prediction")))(encoder).rdd
 
-    val RDD_Nazione_CountHotel: RDD[(String, Int)]= RDD_Nazione_LEVEL.map { case (chiave, _) => (chiave, 1)}.reduceByKey((a, b)=> a+b)
+    val RDD_Nazione_CountHotel: RDD[(String, Int)]= RDD_Nazione_LEVEL
+      .map { case (chiave, _) => (chiave, 1)}
+      .reduceByKey((a, b)=> a+b).persist()
 
     val RDD_Nazione_GOOD: RDD[(String, Int)]= RDD_Nazione_LEVEL
       .filter( coppia=> coppia._2==0)
@@ -62,15 +63,22 @@ object Function5 {
       .map { case (chiave, _) => (chiave, 1) }
       .reduceByKey(_+_)
 
-    val RDD_Nazione_Percent_GOOD = RDD_Nazione_GOOD.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
-    val RDD_Nazione_Percent_INTERMEDIATE = RDD_Nazione_INTERMEDIATE.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
-    val RDD_Nazione_Percent_BAD = RDD_Nazione_BAD.join(RDD_Nazione_CountHotel).map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
+    val RDD_Nazione_Percent_GOOD = RDD_Nazione_GOOD
+      .join(RDD_Nazione_CountHotel)
+      .map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
+
+    val RDD_Nazione_Percent_INTERMEDIATE = RDD_Nazione_INTERMEDIATE
+      .join(RDD_Nazione_CountHotel)
+      .map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
+
+    val RDD_Nazione_Percent_BAD = RDD_Nazione_BAD
+      .join(RDD_Nazione_CountHotel)
+      .map{case (chiave, (sum, count)) => (chiave, sum.toDouble /count*100)}
 
     val RDD_Nazione_Values = RDD_Nazione_Percent_BAD
       .join(RDD_Nazione_Percent_INTERMEDIATE)
       .join(RDD_Nazione_Percent_GOOD)
       .mapValues{case  ((v1, v2), v3)=> (v1, v2, v3)}
-    RDD_Nazione_Values.foreach(println)
     RDD_Nazione_Values.collectAsMap()
     /*
     val prova: Map[String, (Double, Double, Double)] = Map(

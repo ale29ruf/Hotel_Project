@@ -80,7 +80,7 @@ public class WebService {
         Map<String, Object> fun4 = Function4.eseguiAnalisi();
         get("/Function4", (request, response) -> mapper.writeValueAsString(fun4));
 
-        Map<String, Tuple3<Object, Object, Object>> nationality = Function5.eseguiAnalisi();
+        String[] nationality = Function4.getAllNationality();
         get("/nationality", (request, response) -> mapper.writeValueAsString(nationality));
 
         Map<String, Tuple3<Object, Object, Object>> fun5 = Function5.eseguiAnalisi();
