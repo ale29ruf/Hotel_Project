@@ -45,7 +45,6 @@ object Function1 {
       .map(row => row.getString(0))
       .map(word => (word, 1))
       .reduceByKey(_ + _)
-      .persist(StorageLevel.MEMORY_ONLY) // Caching
 
     // Rapporto ogni conteggio di ogni parola per il numero di reviewers della corrispondente nazionalità
     val rapportedRdd = rddOrdinato.join(nationCnt).mapValues(
