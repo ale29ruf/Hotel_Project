@@ -91,7 +91,6 @@ object Function2 {
       .map(row => row.getString(0))
       .map(word => (word, 1))
       .reduceByKey(_ + _)
-      .persist(StorageLevel.MEMORY_ONLY)
 
     val repoundResult = result.join(wordCountsNationality)
       .map { case (key, (map, totRevNat)) =>
