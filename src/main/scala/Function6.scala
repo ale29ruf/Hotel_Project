@@ -39,6 +39,7 @@ object Function6{
     val ordCoppieOcc: RDD[List[String]] = coppieOcc
       .sortBy( coppia=> coppia._2, ascending=false)
       .map{ case (a,_)=>a}
+
     ordCoppieOcc.collect().toList.take(100).foreach(println)
     ordCoppieOcc.collect().toList.take(100)
   }

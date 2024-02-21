@@ -1,8 +1,8 @@
 import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
-import org.apache.spark.storage.StorageLevel
 
 import scala.collection.Map
 
@@ -17,7 +17,7 @@ object Function2 {
   def eseguiAnalisi(): Map[String, Map[String, Double]] = {
 
     // Pre-processing dati
-    val lenRevWithTotRev = WebService.dataFrame.select("Review_Total_Negative_Word_Counts",
+    val lenRevWithTotRev: RDD[(Int, Int)] = WebService.dataFrame.select("Review_Total_Negative_Word_Counts",
       "Review_Total_Positive_Word_Counts").rdd
       .map(row => {
         val negCnt = row.getString(0).toInt
@@ -67,7 +67,8 @@ object Function2 {
     // Lo schema del dataFrame predictions è il seguente:
     // StructType(StructField(ReviewLength,IntegerType,true),StructField(Total_Number_of_Reviews,IntegerType,true),StructField(features,org.apache.spark.ml.linalg.VectorUDT@3bfc3ba7,true),StructField(classification,IntegerType,false))
 
-    val nationalityClass = WebService.dataFrame.select("Reviewer_Nationality").rdd.map(_.getString(0))
+    val nationalityClass: RDD[(String, String)] =
+      WebService.dataFrame.select("Reviewer_Nationality").rdd.map(_.getString(0))
       .zip(
         classifyDataset.select("classification").rdd.map(_.getInt(0).toString)
       )
@@ -75,10 +76,9 @@ object Function2 {
 
     // Eseguo operazioni sulle coppie (nazionalità, classificazione)
     // Eseguo conteggio delle classi per ogni nazionalità di reviewer
-    val result = nationalityClass.groupByKey()
+    val result: RDD[(String, Map[String, Int])] = nationalityClass.groupByKey()
       .mapValues(
-        _.flatMap(_.split("\\s+"))
-          .groupBy(identity).view.mapValues(_.size).toMap)
+          _.groupBy(identity).view.mapValues(_.size).toMap)
 
     // Segue il conteggio per le prime 4 nazioni:
     //(Jersey, Map(1 -> 21, 0 -> 655, 2 -> 187))
@@ -87,12 +87,13 @@ object Function2 {
     //(Saint Martin, Map(0 -> 4))
 
     // Ripondero i conteggi
-    val wordCountsNationality = WebService.dataFrame.select("Reviewer_Nationality").rdd
+    val wordCountsNationality: RDD[(String, Int)] =
+      WebService.dataFrame.select("Reviewer_Nationality").rdd
       .map(row => row.getString(0))
       .map(word => (word, 1))
       .reduceByKey(_ + _)
 
-    val repoundResult = result.join(wordCountsNationality)
+    val repoundResult: RDD[(String, Map[String, Double])] = result.join(wordCountsNationality)
       .map { case (key, (map, totRevNat)) =>
       val repoundedMap = map.view.mapValues( count => (count.toDouble / totRevNat) * 100 ).toMap // divido ogni valore intero della mappa per il numero totale di viewer per quella stessa nazionalità
       (key, repoundedMap) }

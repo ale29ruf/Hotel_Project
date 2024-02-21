@@ -14,7 +14,7 @@ object Function3 {
   def eseguiAnalisi(): Array[(String, Seq[String])] = {
 
     //1) Estrazione 10 top tag
-    val topTags = WebService.dataFrame.rdd
+    val topTags: Array[(String, Int)] = WebService.dataFrame.rdd
       .map(value => value.getAs[String]("Tags"))
       .map(item => item.split(",")) //Suddivido per virgole
       .flatMap(array => array.map(stringa => cleanStringa(stringa).trim)) //Ripulisco ogni stringa di ogni array
@@ -25,7 +25,7 @@ object Function3 {
 
     val hotelTags = WebService.dataFrame.select("Hotel_Address", "Tags")
 
-    val countHotelTags = hotelTags.rdd
+    val countHotelTags: RDD[(String, Seq[(String, Int)])] = hotelTags.rdd
       .map(row => ( row.getString(0), row.getString(1) ))
       .mapValues { tags => tags
         .split(",") //Suddivido per virgole
@@ -39,9 +39,9 @@ object Function3 {
 
 
     //3) Selezione top 5 tag piu' frequenti per ogni hotel (con relativo hotel che sarebbe la chiave della coppia)
-    val tagsToExtract = topTags.map(_._1).toSet
+    val tagsToExtract: Set[String] = topTags.map(_._1).toSet
 
-    val result = countHotelTags
+    val result: RDD[(String, Seq[String])] = countHotelTags
       .mapValues( seq => seq
         .filter { case (key, _) => tagsToExtract.contains(key) }
         .take(5))

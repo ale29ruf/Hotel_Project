@@ -46,7 +46,7 @@ object Function5 {
 
     val RDD_Nazione_CountHotel: RDD[(String, Int)]= RDD_Nazione_LEVEL
       .map { case (chiave, _) => (chiave, 1)}
-      .reduceByKey((a, b)=> a+b).persist()
+      .reduceByKey((a, b)=> a+b)
 
     val RDD_Nazione_GOOD: RDD[(String, Int)]= RDD_Nazione_LEVEL
       .filter( coppia=> coppia._2==0)
