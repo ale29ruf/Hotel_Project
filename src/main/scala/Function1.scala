@@ -47,7 +47,7 @@ object Function1 {
     // Rapporto ogni conteggio di ogni parola per il numero di reviewers della corrispondente nazionalità
     val rapportedRdd: RDD[(String, List[(String, Double)])] = rddOrdinato.join(nationCnt).mapValues(
       element => element._1.map(
-        { case (parola, conteggio) => (parola, (conteggio.toDouble / element._2)*100 ) }).toList)
+        { case (parola, conteggio) => (parola, (conteggio.toDouble / element._2) ) }).toList)
       //.filter { case (_, lista) => lista.nonEmpty }
 
     // Stampa i risultati

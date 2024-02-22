@@ -104,15 +104,6 @@ object Function2 {
     // (Liberia, Map(0 -> 66.66666666666666, 2 -> 33.33333333333333))
     // (Uzbekistan, Map(0 -> 85.0, 2 -> 15.0))
 
-    // Estrarre la chiave con il valore più alto '1' (classe più significativa
-    val keyWithMaxValueOne = repoundResult.mapValues(_.getOrElse("1", 0.0)) // Ottenere il valore '1' dalla mappa, se non presente usare 0.0
-      .reduce((x, y) => if (x._2 > y._2) x else y) // Ridurre al massimo valore '1'
-
-    // Stampa della chiave con il valore '1' più alto
-    println("Chiave con il valore '1' più alto: " + keyWithMaxValueOne._1)
-    println("Numero di recensori per la nazionalità più significativa: " +
-      wordCountsNationality.filter(_._1 == keyWithMaxValueOne._1).map(_._2).first())
-
     repoundResult.collectAsMap()
   }
 

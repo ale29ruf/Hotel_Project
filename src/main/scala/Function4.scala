@@ -23,10 +23,11 @@ object Function4{
     val nationalitySumScore: RDD[(String, Double)] = coppieNationalityScore
       .reduceByKey((a, b) => a + b)
 
-    //Score medio per nazionalità con ordinamwnto
+    //Score medio per nazionalità con ordinamento
     val nationalityMeanScore = nationalitySumScore.join(nationalityCount)
       .map { case (chiave, (sum, count)) => (chiave, sum / count) }
       .sortBy(coppia => coppia._2, ascending = true)
+
     nationalityMeanScore.foreach(println)
     nationalityMeanScore.collectAsMap()
   }
